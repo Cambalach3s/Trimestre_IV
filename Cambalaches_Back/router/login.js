@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
 
             const tokenSession = await tokenSign(resultado[0]);
             if (resultado.length > 0) {
-                console.log("Chido");
+                console.log("Nice");
                 res.json(tokenSession)
             } else {
                 res.json(false)
