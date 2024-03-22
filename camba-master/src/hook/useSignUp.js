@@ -3,9 +3,6 @@ import * as Yup from "yup";
 
 export const useSignUp = (handleSubmit) => {
   const validationSchema = Yup.object({
-    id_usuario: Yup.string().required("Campo requerido"),
-    nom_persona: Yup.string().required("Campo requerido"),
-    apell_persona: Yup.string().required("Campo requerido"),
     email: Yup.string().email("Correo inválido").required("Campo requerido"),
 
     password: Yup.string()
@@ -16,9 +13,6 @@ export const useSignUp = (handleSubmit) => {
   });
 
   const initialValues = {
-    id_usuario: "",
-    nom_persona: "",
-    apell_persona: "",
     email: "",
     password: "",
   };

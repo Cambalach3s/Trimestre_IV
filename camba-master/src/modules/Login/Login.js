@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from 'react-router-dom'; // Importa Navigate
 import { useLoginMutation } from "../../services/authServices";
 
@@ -24,10 +23,10 @@ const InputField = ({ label, type, id, name, value, onChange }) => {
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate (); // Hook useNavigate para redirigir al usuario después del inicio de sesión
+  const navigate = useNavigate(); // Hook useNavigate para redirigir al usuario después del inicio de sesión
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false); // Estado para indicar si se está realizando la solicitud
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para indicar si el usuario está autenticado
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para el mensaje de éxito
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -37,36 +36,23 @@ const Login = () => {
     setPassword(e.target.value);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-  //   try {
-  //     const response = await axios.post("http://localhost:3001/login", { email, password });
-  //     console.log('Respuesta del servidor:', response.data); // Agrega este console.log para verificar la respuesta del servidor
-  //     setIsLoggedIn(true);
-  //   } catch (error) {
-  //     console.error("Error al iniciar sesión:", error);
-  //     setError("Correo electrónico o contraseña incorrectos");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // // Si el usuario está autenticado, redirige a la página de inicio
-  // if (isLoggedIn) {
-  //   return <Navigate to="/home" />;
-  // }
   const { mutateAsync } = useLoginMutation();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
+    
     try {
       const formData = { email, password };
-      const data = await mutateAsync(formData);
-      navigate("/home");
+      console.log('Datos a enviar:', formData);
+      await mutateAsync(formData);
+      console.log('Redirigiendo a /Home...'); // Agrega este console.log para verificar si se está llamando a la redirección
+      navigate("/Home"); // Aquí intentas redirigir al usuario a la página de inicio
+      setSuccessMessage('¡Inicio de sesión exitoso!');
     } catch (error) {
-      alert(error.message);
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +77,7 @@ const Login = () => {
           onChange={handlePasswordChange}
         />
         {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
+        {successMessage && <div style={{ color: "green", marginBottom: "10px" }}>{successMessage}</div>}
         <div style={{ textAlign: "center" }}>
           <button type="submit" className="btn btn-primary" style={{ backgroundColor: "#007bff", color: "#fff", border: "none", padding: "0.5rem 1rem", cursor: loading ? "not-allowed" : "pointer" }} disabled={loading}>
             {loading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}

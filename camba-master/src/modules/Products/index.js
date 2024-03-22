@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import Categories from '../../components/Categories'
-import ProductosCard from '../../components/ProductCard'
+import ProductCard from '../../components/ProductCard'
 
-const Productos = () => {
-  const [productos, setProductos] = useState([])
+const Products = () => {
+  const [products, setProducts] = useState([])
   useEffect(() => {
-    const fetchProductos = async () => {
-      const response = await fetch('http://localhost:3001/productos')
+    const fetchProducts = async () => {
+      const response = await fetch('https://fakestoreapi.com/products')
       const data = await response.json()
       console.log(data)
-      setProductos(data)
+      setProducts(data)
     }
-    fetchProductos()
+    fetchProducts()
   }, [])
 
   return (
@@ -22,8 +22,8 @@ const Productos = () => {
         <h1 className="sm:text-3xl text-2xl font-medium title-font text-gray-900">TODOS LOS PRODUCTOS</h1>
       </div>
       {
-        productos.length > 0 ?
-        <ProductosCard productos={productos}/>
+        products.length > 0 ?
+        <ProductCard products={products}/>
         :
         <div>Loading.....</div>
       }
@@ -31,4 +31,4 @@ const Productos = () => {
   )
 }
 
-export default Productos
+export default Products
