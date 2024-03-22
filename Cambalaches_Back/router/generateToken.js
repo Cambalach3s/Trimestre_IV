@@ -4,12 +4,13 @@
 const jwt = require('jsonwebtoken');
 
 // Función para generar un token de sesión
-const tokenSign = async (usuario) => {
+const tokenSign = async (idUsuario) => {
     try {
         // Genera el token utilizando jsonwebtoken
-        const token = jwt.sign({ id: usuario.id, email: usuario.email }, 'secreto', { expiresIn: '1h' });
+        const token = jwt.sign({ id_usuario: idUsuario }, 'secreto', { expiresIn: '1h' });
         return token;
     } catch (error) {
+        console.error('Error al generar el token:', error);
         throw new Error('Error al generar el token');
     }
 };

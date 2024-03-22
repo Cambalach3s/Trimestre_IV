@@ -8,31 +8,27 @@ const roleAuth = (roles) => async (req, res, next) => {
         const authorizationHeader = req.headers.authorization;
 
         if (!authorizationHeader) {
-            res.status(401);
-            return res.send({ error: 'Falta el encabezado de autorización' });
+            return res.status(401).send({ error: 'Falta el encabezado de autorización' });
         }
 
         const token = req.headers.authorization.split(' ').pop()
         const tokenData = await verifyToken(token)
 
-        const userData = `SELECT * FROM usuario WHERE id_usuario=${tokenData.id_usuario};`
+        const userData = `SELECT * FROM usuarios WHERE id_usuario=${tokenData.id_usuario};`
         conexion.query(userData, (error, resultado) => {
             if (error) return console.error(error.message)
 
             if ([].concat(roles).includes(resultado[0].Rol_IdRol)) {
                 next()
             } else {
-                res.status(409)
-                res.send({ error: 'Permisos Fuera De Alcance' })
+                return res.status(409).send({ error: 'Permisos Fuera De Alcance' });
             }
         })
 
     } catch (e) {
         console.log(e)
-        res.status(409)
-        res.send({ error: 'Prohibido el paso, De aqui no pasas!' })
+        return res.status(409).send({ error: 'Prohibido el paso, De aqui no pasas!' });
     }
-
 }
 
-module.exports = roleAuth
+module.exports = roleAuth;

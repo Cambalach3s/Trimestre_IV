@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const express = require('express');
 const router = express.Router();
-const pool = require('../app'); // Importa la conexión compatible con promesas
+const connection = require('../app'); // Importa la conexión compatible con promesas
 const { tokenSign } = require('./generateToken');
 const cors = require('cors');
 
@@ -17,24 +17,56 @@ router.post('/', async (req, res) => {
     console.log('Datos recibidos:', email, password);
 
     try {
-        const result = await pool.execute('SELECT * FROM usuarios WHERE email = ?', [email]);
-        const rows = result[0]; 
+        console.log('====================================');
+        console.log("DEntro del try");
+        console.log('====================================');
 
-        if (!rows || rows.length === 0) { // Verifica si el resultado está vacío o no existe
-            return res.status(401).json({ error: 'Correo electrónico o contraseña incorrectos' });
-        }
+        // Ejecutar la consulta SQL
+        connection.query('SELECT * FROM usuarios WHERE email = ?', [email], (error, results, fields) => {
+            if (error) {
+                console.error('Error en la consulta SQL:', error);
+                return res.status(500).json({ error: 'Error en el servidor' });
+            }
 
-        const usuario = rows[0]; 
+            if (!results || results.length === 0) {
+                console.log('====================================');
+                console.log("Primer if");
+                console.log('====================================');
+                return res.status(401).json({ error: 'Correo electrónico o contraseña incorrectos' });
+            }
 
-        const passwordMatch = await bcrypt.compare(password, usuario.password);
+            console.log('====================================');
+            console.log("Despues del primer if");
+            console.log('====================================');
 
-        if (!passwordMatch) {
-            return res.status(401).json({ error: 'Correo electrónico o contraseña incorrectos' });
-        }
+            const usuario = results[0];
 
-        const tokenSession = await tokenSign(usuario);
-        res.json(tokenSession);
+            console.log('====================================');
+            console.log("Datos primera clave: ", password, " Dato de segunda clave: ", usuario.password);
+            console.log('====================================');
+
+            bcrypt.compare(password, usuario.password, (err, passwordMatch) => {
+                console.log('=============error=======================');
+                console.log(err);
+                console.log('=============error=======================');
+                console.log('===================uiii=================');
+                console.log(passwordMatch);
+                console.log('=================uiuiii===================');
+                if (err || !passwordMatch) {
+                    console.log('====================================');
+                    console.log("Dentro del segundo if");
+                    console.log('====================================');
+                    return res.status(401).json({ error: 'Correo electrónico o contraseña incorrectos' });
+                }
+
+                const tokenSession = tokenSign(usuario);
+                res.json(tokenSession);
+            });
+        });
     } catch (error) {
+        console.log('====================================');
+        console.log("Dentro del catch del try");
+        console.log('====================================');
         console.error('Error en la consulta SQL:', error);
         res.status(500).json({ error: 'Error en el servidor' });
     }
